@@ -20,7 +20,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "https://socket-io-henna.vercel.app/", methods: ['POST', 'GET'], credentials: true } });
 
 
-app.use(cors())
+app.use(cors({ origin: "https://socket-io-henna.vercel.app/", methods: ['POST', 'GET'], credentials: true }))
 app.use(express.json());
 app.use(morgan('dev'));
 

@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
+
 const CreateUserPage = () => {
-  const socket = io(`https://socket-io-6tt7.onrender.com/`);
 
   const [fristName, setFristName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -27,7 +26,7 @@ const CreateUserPage = () => {
       } else {
         alert(data?.message)
       }
-      socket.emit('joinRoom', ({email: email}))
+
     } catch (error) {
       console.log(error);
       alert(error?.message);

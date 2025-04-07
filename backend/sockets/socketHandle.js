@@ -10,7 +10,6 @@ export const handleSocket = (io) => {
       socket.join("live_users");
       liveUsers[socket.id] = { socketId: socket.id };
       await authModel.findOneAndUpdate({ email }, { socketId: socket.id }, { upsert: true });
-      
 
       io.to("live_users").emit("updateUsers", Object.values(liveUsers));
     });

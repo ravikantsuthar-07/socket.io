@@ -124,3 +124,54 @@ export const getUserByEmailAuthController = async (req, res) => {
         });
     }
 }
+
+export const loginAuthController = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        if (!email || !password) {
+            return res.send({
+                status: 404,
+                success: false,
+                message: "Invaild email and password"
+            });
+        }
+
+        // check user
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.send({
+                status: 404,
+                success: false,
+                message: "Email is not registed"
+            })
+        }
+        if (password === user.password) {
+            
+            const token = await JWT.sign({ _id: user.id }, process.env.JWT_SECRET, { expiresIn: '5d' });
+            res.send({
+                status: 200,
+                success: true,
+                message: "Login Successfully",
+                user: {
+                    name: user.name,
+                    email: user.email,
+                    phone: user.phone,
+                    address: user.address,
+                    role: user.role
+                },
+                token
+            })
+        } else{
+            return res.status(403).send({
+                success: false,
+                message: 'Invalid Password'
+            });
+        }
+    } catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: 'Error in Login',
+            error
+        })
+    }
+}

@@ -17,7 +17,7 @@ connection();
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "https://socket-io-frontend-rho.vercel.app", methods: ['POST', 'GET'], credentials: true } });
+const io = new Server(server, { cors: { origin: "https://socket-io-henna.vercel.app/", methods: ['POST', 'GET'], credentials: true } });
 
 
 app.use(cors())

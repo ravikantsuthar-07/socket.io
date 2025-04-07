@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 const CreateUserPage = () => {
   const socket = io(`https://socket-io-6tt7.onrender.com/`);
+
   const [fristName, setFristName] = useState("");
   const [lastName, setLastName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
@@ -18,27 +19,17 @@ const CreateUserPage = () => {
   const handleUser = async (e) => {
     e.preventDefault()
     try {
-      const formData = new FormData();
-      formData.append('fristName', fristName);
-      formData.append('lastName', lastName);
-      formData.append('mobileNo', mobileNo);
-      formData.append('email', email);
-      formData.append('street', street);
-      formData.append('city', city);
-      formData.append('state', state);
-      formData.append('country', country);
-      formData.append('loginId', loginId);
-      formData.append('password', password);
-      const { data } = await axios.post(`https://socket-io-6tt7.onrender.com/api/v1/auth/create`, {fristName, lastName, mobileNo, email, street, city, state, country, loginId, password})
-      if (data?.success) {
-        socket.on('joinRoom', ()=> {
+
+      socket.on('joinRoom', async () => {
+        const { data } = await axios.post(`https://vercel-deployment-backend.onrender.com/api/v1/auth/create`, { fristName, lastName, mobileNo, email, street, city, state, country, loginId, password, socketId: socket.id })
+        if (data?.success) {
           alert(data.message)
           navigate(`/`)
-        })
-      } else{
-        alert(data?.message)
-      }
-    } catch (error) {    
+        } else {
+          alert(data?.message)
+        }
+      })
+    } catch (error) {
       console.log(error);
       alert(error?.message);
     }
@@ -52,7 +43,7 @@ const CreateUserPage = () => {
             <form method='post' onSubmit={handleUser}>
               <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Frist Name</label>
-                <input type="text" class="form-control" name="fristName" id="fristname" onChange={(e) => {setFristName(e.target.value)}} />
+                <input type="text" class="form-control" name="fristName" id="fristname" onChange={(e) => { setFristName(e.target.value) }} />
               </div>
               <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Last Name</label>

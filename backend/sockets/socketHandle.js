@@ -8,8 +8,9 @@ export const handleSocket = (io) => {
 
     socket.on("joinRoom", async ({email }) => {
       socket.join("live_users");
-      liveUsers[socket.id] = { email, socketId: socket.id };
-
+      liveUsers[socket.id] = { socketId: socket.id };
+      console.log(liveUsers);
+      
       await authModel.findOneAndUpdate({ email }, { socketId: socket.id }, { upsert: true });
 
       io.to("live_users").emit("updateUsers", Object.values(liveUsers));

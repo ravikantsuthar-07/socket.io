@@ -20,15 +20,14 @@ const CreateUserPage = () => {
     e.preventDefault()
     try {
 
-      socket.on('joinRoom', async () => {
-        const { data } = await axios.post(`https://vercel-deployment-backend.onrender.com/api/v1/auth/create`, { fristName, lastName, mobileNo, email, street, city, state, country, loginId, password, socketId: socket.id })
-        if (data?.success) {
-          alert(data.message)
-          navigate(`/`)
-        } else {
-          alert(data?.message)
-        }
-      })
+      const { data } = await axios.post(`https://vercel-deployment-backend.onrender.com/api/v1/auth/create`, { fristName, lastName, mobileNo, email, street, city, state, country, loginId, password, socketId: socket.id })
+      if (data?.success) {
+        alert(data.message)
+        navigate(`/`)
+      } else {
+        alert(data?.message)
+      }
+      socket.emit('joinRoom', ({email: email}))
     } catch (error) {
       console.log(error);
       alert(error?.message);

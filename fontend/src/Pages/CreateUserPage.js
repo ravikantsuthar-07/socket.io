@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 const CreateUserPage = () => {
+  const socket = io(`https://socket-io-6tt7.onrender.com/`);
   const [fristName, setFristName] = useState("");
   const [lastName, setLastName] = useState("");
   const [mobileNo, setMobileNo] = useState("");
@@ -28,10 +30,11 @@ const CreateUserPage = () => {
       formData.append('loginId', loginId);
       formData.append('password', password);
       const { data } = await axios.post(`https://socket-io-6tt7.onrender.com/api/v1/auth/create`, {fristName, lastName, mobileNo, email, street, city, state, country, loginId, password})
-      console.log(data);
       if (data?.success) {
-        alert(data.message)
-        navigate(`/`)
+        socket.on('joinRoom', ()=> {
+          alert(data.message)
+          navigate(`/`)
+        })
       } else{
         alert(data?.message)
       }

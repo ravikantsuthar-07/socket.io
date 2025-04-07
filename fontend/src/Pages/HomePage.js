@@ -1,0 +1,97 @@
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import io from 'socket.io-client'
+
+const HomePage = () => {
+    const socket = io(`http://localhost:8080/`);
+
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState([]);
+    const gettingUser = async () => {
+        try {
+            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/get`);
+            if (data?.success) {
+                setUsers(data?.user);
+
+            }
+        } catch (error) {
+            alert(error?.responce?.data?.mesage);
+        }
+    }
+
+    const fetchUserDetails = async (email) => {
+        try {
+            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/user/${email}`)
+            setSelectedUser(data?.user);
+            socket.emit("joinRoom", data?.user);
+
+            socket.on("updateUsers", (updatedUsers) => {
+                setUsers(updatedUsers);
+            });
+        } catch (error) {
+            alert(error?.responce?.data?.message);
+        }
+    }
+    useEffect(() => {
+        gettingUser();
+        // eslint-disable-next-line
+    }, [])
+
+    return (
+        <div className='container'>
+            <div className='row'>
+                <div className='col-md-12'>
+
+                    <h1 className='text-center'>User List</h1>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Mobile Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map((u, i) => (
+
+
+                                <tr key={i}>
+                                    {console.log(u)}
+                                    <th scope="row">{i+1}</th>
+                                    <td>{u.fristName + " " + u.lastName}</td>
+                                    <td onClick={() => fetchUserDetails(u.email)} style={{ cursor: "pointer" }}>{u.email}</td>
+                                    <td>{u.mobileNo}</td>
+                                </tr>
+                            ))}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    {/* <h2>Live Users</h2>
+                    <ul>
+                        {users.map((user) => (
+                            <li key={user.socketId} onClick={() => fetchUserDetails(user.email)} style={{ cursor: "pointer" }}>
+                                {user.fristName} ({user.email})
+                            </li>
+                        ))}
+                    </ul> */}
+
+                    {selectedUser && (
+                        <div style={{ border: "1px solid black", padding: "10px", marginTop: "10px" }}>
+                            <h3>User Details</h3>
+                            <p><strong>Name:</strong> {selectedUser.fristName + " " + selectedUser.lastName}</p>
+                            <p><strong>Email:</strong> {selectedUser.email}</p>
+                            <p><strong>Socket ID:</strong> {selectedUser.socketId}</p>
+                            <button onClick={() => setSelectedUser(null)}>Close</button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default HomePage

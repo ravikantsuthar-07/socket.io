@@ -30,6 +30,11 @@ const HomePage = () => {
             socket.on("updateUsers", (updatedUsers) => {
                 setLiveUsers(updatedUsers);
             });
+            return (() => {
+                socket.on("disconnect", (s) => {
+                    setLiveUsers([])
+                })
+            })
         } catch (error) {
             alert(error?.responce?.data?.message);
         }

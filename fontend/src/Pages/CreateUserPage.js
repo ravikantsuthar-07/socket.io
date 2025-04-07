@@ -27,7 +27,7 @@ const CreateUserPage = () => {
       formData.append('country', country);
       formData.append('loginId', loginId);
       formData.append('password', password);
-      const { data } = await axios.post(`https://vercel-deployment-backend.onrender.com/api/v1/auth/create`, {fristName, lastName, mobileNo, email, street, city, state, country, loginId, password})
+      const { data } = await axios.post(`http://localhost:8080/api/v1/auth/create`, {fristName, lastName, mobileNo, email, street, city, state, country, loginId, password})
       console.log(data);
       if (data?.success) {
         alert(data.message)

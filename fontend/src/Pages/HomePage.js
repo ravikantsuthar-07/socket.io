@@ -1,10 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
+import { Link } from 'react-router-dom'
 
 const HomePage = () => {
     const socket = io(`http://localhost:8080/`);
 
+    const [liveUsers, setLiveUsers] = useState([]);
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState([]);
     const gettingUser = async () => {
@@ -26,7 +28,7 @@ const HomePage = () => {
             socket.emit("joinRoom", data?.user);
 
             socket.on("updateUsers", (updatedUsers) => {
-                setUsers(updatedUsers);
+                setLiveUsers(updatedUsers);
             });
         } catch (error) {
             alert(error?.responce?.data?.message);
@@ -41,7 +43,7 @@ const HomePage = () => {
         <div className='container'>
             <div className='row'>
                 <div className='col-md-12'>
-
+                    <Link to={`/create`} className="btn btn-primary" >Add User</Link>
                     <h1 className='text-center'>User List</h1>
                     <table class="table">
                         <thead>
@@ -58,7 +60,7 @@ const HomePage = () => {
 
                                 <tr key={i}>
                                     {console.log(u)}
-                                    <th scope="row">{i+1}</th>
+                                    <th scope="row">{i + 1}</th>
                                     <td>{u.fristName + " " + u.lastName}</td>
                                     <td onClick={() => fetchUserDetails(u.email)} style={{ cursor: "pointer" }}>{u.email}</td>
                                     <td>{u.mobileNo}</td>
@@ -70,14 +72,14 @@ const HomePage = () => {
                 </div>
 
                 <div>
-                    {/* <h2>Live Users</h2>
+                    <h2>Live Users</h2>
                     <ul>
-                        {users.map((user) => (
+                        {liveUsers.map((user) => (
                             <li key={user.socketId} onClick={() => fetchUserDetails(user.email)} style={{ cursor: "pointer" }}>
                                 {user.fristName} ({user.email})
                             </li>
                         ))}
-                    </ul> */}
+                    </ul>
 
                     {selectedUser && (
                         <div style={{ border: "1px solid black", padding: "10px", marginTop: "10px" }}>

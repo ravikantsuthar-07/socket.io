@@ -1,3 +1,4 @@
+import { token } from 'morgan';
 import authModel from '../models/authModel.js';
 
 let liveUsers = {};
@@ -8,7 +9,7 @@ export const handleSocket = (io) => {
 
     socket.on("joinRoom", async ({email }) => {
       socket.join("live_users");
-      liveUsers[socket.id] = { socketId: socket.id };
+      liveUsers[socket.id] = { email, socketId: socket.id };
       await authModel.findOneAndUpdate({ email }, { socketId: socket.id }, { upsert: true });
 
       io.to("live_users").emit("updateUsers", Object.values(liveUsers));
@@ -18,7 +19,7 @@ export const handleSocket = (io) => {
       console.log(`User disconnected: ${socket.id}`);
       delete liveUsers[socket.id];
 
-      await authModel.findOneAndUpdate({ socketId: socket.id }, { socketId: null });
+      await authModel.findOneAndUpdate({ socketId: socket.id }, { socketId: null, token: null });
 
       io.to("live_users").emit("updateUsers", Object.values(liveUsers));
     });

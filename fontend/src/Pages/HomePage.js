@@ -4,14 +4,14 @@ import io from 'socket.io-client'
 import { Link } from 'react-router-dom'
 
 const HomePage = () => {
-    const socket = io(`https://socket-io-6tt7.onrender.com/`);
+    const socket = io(`http://localhost:8080/`);
 
-    const [liveUsers, setLiveUsers] = useState([]);
+    const [liveUser, setLiveUser] = useState([]);
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState([]);
     const gettingUser = async () => {
         try {
-            const { data } = await axios.get(`https://socket-io-6tt7.onrender.com/api/v1/auth/get`);
+            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/get`);
             if (data?.success) {
                 setUsers(data?.user);
 
@@ -20,28 +20,37 @@ const HomePage = () => {
             alert(error?.responce?.data?.mesage);
         }
     }
-
-    const fetchUserDetails = async (email) => {
+    const gettingLiveUser = async () => {
         try {
-            const { data } = await axios.get(`https://socket-io-6tt7.onrender.com/api/v1/auth/user/${email}`)
-            setSelectedUser(data?.user);
-            socket.emit("joinRoom", data?.user);
-
-            socket.on("updateUsers", (updatedUsers) => {
-                setLiveUsers(updatedUsers);
-            });
-            
+            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/getLiveUser`)
+            socket.emit("live_users", data?.user);
+            setLiveUser(data?.user);
         } catch (error) {
             alert(error?.responce?.data?.message);
         }
     }
+
+    const fetchUserDetails = async (email) => {
+        try {
+            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/user/${email}`)
+            socket.emit("joinRoom", data?.user);
+            setSelectedUser(data?.user);
+        } catch (error) {
+            alert(error?.responce?.data?.message);
+        }
+    }
+    const deleteSocket = (id) => {
+        socket.emit("disconnect", (s)=> {
+            console.log(s)
+        })
+    }
     useEffect(() => {
         gettingUser();
-        return (() => {
-            socket.on("disconnect", (s) => {
-                setLiveUsers([])
-            })
-        })
+        gettingLiveUser();
+        socket.emit("live_users", users).on("updateUsers", (updatedUsers) => {
+            setLiveUser(updatedUsers)
+        });
+
         // eslint-disable-next-line
     }, [])
 
@@ -80,7 +89,7 @@ const HomePage = () => {
                 <div>
                     <h2>Live Users</h2>
                     <ul>
-                        {liveUsers.map((user) => (
+                        {liveUser.map((user) => (
                             <li key={user.socketId} onClick={() => fetchUserDetails(user.email)} style={{ cursor: "pointer" }}>
                                 {user.fristName} ({user.email})
                             </li>
@@ -93,7 +102,7 @@ const HomePage = () => {
                             <p><strong>Name:</strong> {selectedUser.fristName + " " + selectedUser.lastName}</p>
                             <p><strong>Email:</strong> {selectedUser.email}</p>
                             <p><strong>Socket ID:</strong> {selectedUser.socketId}</p>
-                            <button onClick={() => setSelectedUser(null)}>Close</button>
+                            <button onClick={() => deleteSocket(selectedUser.socketId)}>Close</button>
                         </div>
                     )}
                 </div>

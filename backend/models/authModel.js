@@ -43,6 +43,9 @@ const authSchema = mongoose.Schema(
                 message: props => `${props.value} is not a valid password! It must have at least one uppercase letter, one lowercase letter, one number, and one special character.`,
             }
         },
+        token:{
+            type: String
+        },
         creationsTime: {
             type: Date,
             require: true,

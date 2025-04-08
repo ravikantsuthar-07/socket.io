@@ -1,5 +1,5 @@
 import authModel from "../models/authModel.js";
-
+import JWT from 'jsonwebtoken'
 export const createAuthController = async (req, res) => {
     try {
         const {fristName, lastName, mobileNo, email, street, city, state, country, loginId, password} = req.body;
@@ -127,7 +127,8 @@ export const getUserByEmailAuthController = async (req, res) => {
 
 export const loginAuthController = async (req, res) => {
     try {
-        const {email, password} = req.body;
+        
+        const {email, password, socketId} = req.body;
         if (!email || !password) {
             return res.send({
                 status: 404,
@@ -135,32 +136,27 @@ export const loginAuthController = async (req, res) => {
                 message: "Invaild email and password"
             });
         }
-
+        
         // check user
-        const user = await userModel.findOne({ email });
+        const user = await authModel.findOne({ email });
         if (!user) {
-            return res.send({
-                status: 404,
+            return res.status(404).send({
                 success: false,
                 message: "Email is not registed"
             })
         }
-        if (password === user.password) {
+        if (password === user?.password) {
             
-            const token = await JWT.sign({ _id: user.id }, process.env.JWT_SECRET, { expiresIn: '5d' });
-            res.send({
-                status: 200,
-                success: true,
-                message: "Login Successfully",
-                user: {
-                    name: user.name,
-                    email: user.email,
-                    phone: user.phone,
-                    address: user.address,
-                    role: user.role
-                },
-                token
-            })
+            const token = await JWT.sign({ _id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            const login = await authModel.findOneAndUpdate({email}, {token, socketId}, { upsert: true });
+            if (login) {
+                res.status(200).send({
+                    success: true,
+                    message: "Login Successfully",
+                    user,
+                    token
+                })
+            }
         } else{
             return res.status(403).send({
                 success: false,
@@ -171,6 +167,25 @@ export const loginAuthController = async (req, res) => {
         return res.status(500).send({
             success: false,
             message: 'Error in Login',
+            error
+        })
+    }
+}
+
+export const getLiveUserAuthController = async (req, res) => {
+    try {
+        const liveUser = await authModel.find({})
+        if (liveUser) {
+            return res.status(200).send({
+                success: true,
+                message: 'Live User Getting Successfully',
+                user: liveUser
+            })
+        }
+    } catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: 'Error in Getting LiveUser',
             error
         })
     }

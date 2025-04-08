@@ -5,8 +5,8 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 
 import http from 'http'
-import {Server} from 'socket.io'
-import {handleSocket} from './sockets/socketHandle.js'
+import { Server } from 'socket.io'
+import { handleSocket } from './sockets/socketHandle.js'
 
 import authRoutes from './Routes/authRoutes.js'
 import connection from './Config/D.js'
@@ -16,11 +16,24 @@ connection();
 
 
 const app = express();
+
+app.use(cors({
+	origin: "http://localhost:3000",
+	methods: ['POST', 'GET'],
+	credentials: true
+}))
+
+
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "https://socket-io-henna.vercel.app/", methods: ['POST', 'GET'], credentials: true } });
+const io = new Server(server, {
+	cors: {
+		origin: "http://localhost:3000",
+		methods: ['POST', 'GET'],
+		credentials: true
+	}
+});
 
 
-app.use(cors())
 app.use(express.json());
 app.use(morgan('dev'));
 

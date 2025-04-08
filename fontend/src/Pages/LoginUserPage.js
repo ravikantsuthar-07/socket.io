@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/auth.js'
 import { io } from 'socket.io-client';
 
+
 const LoginUserPage = () => {
-  const socket = io(`https://socket-io-6tt7.onrender.com/`);
+ const socket = io(`http://localhost:8080`);
 
   const [auth, setAuth] = useAuth()
   const [email, setEmail] = useState("");
@@ -14,14 +15,14 @@ const LoginUserPage = () => {
   const handleUser = async (e) => {
     e.preventDefault()
     try {
-      const { data } = await axios.post(`https://vercel-deployment-backend.onrender.com/api/v1/auth/login`, { email, password })
+      const { data } = await axios.post(`http://localhost:8080/api/v1/auth/login`, { email, password, socketId : socket.id })
       if (data?.success) {
-        socket.on('joinRoom', {email})
         setAuth({
           ...auth,
           user: data?.user,
           token: data?.token
         })
+        socket.emit("joinRoom", data?.user)
         alert(data.message);
         navigate(`/`);
       } else {

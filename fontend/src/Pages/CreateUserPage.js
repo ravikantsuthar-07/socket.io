@@ -19,7 +19,7 @@ const CreateUserPage = () => {
     e.preventDefault()
     try {
 
-      const { data } = await axios.post(`http://localhost:8080/api/v1/auth/create`, { fristName, lastName, mobileNo, email, street, city, state, country, loginId, password })
+      const { data } = await axios.post(`https://socket-io-6tt7.onrender.com/api/v1/auth/create`, { fristName, lastName, mobileNo, email, street, city, state, country, loginId, password })
       if (data?.success) {
         alert(data.message)
         navigate(`/login`)

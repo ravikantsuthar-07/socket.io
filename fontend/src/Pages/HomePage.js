@@ -4,14 +4,14 @@ import io from 'socket.io-client'
 import { Link } from 'react-router-dom'
 
 const HomePage = () => {
-    const socket = io(`http://localhost:8080/`);
+    const socket = io(`https://socket-io-6tt7.onrender.com/`);
 
     const [liveUser, setLiveUser] = useState([]);
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState([]);
     const gettingUser = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/get`);
+            const { data } = await axios.get(`https://socket-io-6tt7.onrender.com/api/v1/auth/get`);
             if (data?.success) {
                 setUsers(data?.user);
 
@@ -22,7 +22,7 @@ const HomePage = () => {
     }
     const gettingLiveUser = async () => {
         try {
-            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/getLiveUser`)
+            const { data } = await axios.get(`https://socket-io-6tt7.onrender.com/api/v1/auth/getLiveUser`)
             socket.emit("live_users", data?.user);
             setLiveUser(data?.user);
         } catch (error) {
@@ -32,7 +32,7 @@ const HomePage = () => {
 
     const fetchUserDetails = async (email) => {
         try {
-            const { data } = await axios.get(`http://localhost:8080/api/v1/auth/user/${email}`)
+            const { data } = await axios.get(`https://socket-io-6tt7.onrender.com/api/v1/auth/user/${email}`)
             socket.emit("joinRoom", data?.user);
             setSelectedUser(data?.user);
         } catch (error) {
